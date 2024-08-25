@@ -11,15 +11,30 @@ import lombok.Getter;
 @Getter
 public enum SuitEnums {
 
-    SPADES("Spades"),   // 黑桃
-    HEARTS("Hearts"),   // 红桃
-    CLUBS("Clubs"),     // 梅花
-    DIAMONDS("Diamonds"); // 方块
+    /**
+     * 黑桃
+     */
+    SPADES("♠"),
 
-    private final String name;
+    /**
+     * 红桃
+     */
+    HEARTS("♥"),
 
-    SuitEnums(String name) {
-        this.name = name;
+    /**
+     * 梅花
+     */
+    CLUBS("♣"),
+
+    /**
+     * 方块
+     */
+    DIAMONDS("♦");
+
+    private final String desc;
+
+    SuitEnums(String desc) {
+        this.desc = desc;
     }
 
 }
