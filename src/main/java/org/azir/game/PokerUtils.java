@@ -40,8 +40,9 @@ public class PokerUtils {
      */
     public static List<Poker> randomPoker0(List<Poker> pokerList) {
         Poker[] array = pokerList.toArray(new Poker[]{});
+        Random random = new Random();
         for (int i = 0; i < array.length; i++) {
-            int index = (int) (Math.random() * array.length);
+            int index = random.nextInt(array.length - i);
             Poker temp = array[i];
             array[i] = array[index];
             array[index] = temp;
