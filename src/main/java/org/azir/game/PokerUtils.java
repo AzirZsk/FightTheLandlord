@@ -37,6 +37,7 @@ public class PokerUtils {
      * 随机交换位置
      *
      * @param pokerList 扑克牌
+     * @return 打乱后的扑克牌
      */
     public static List<Poker> randomPoker0(List<Poker> pokerList) {
         Poker[] array = pokerList.toArray(new Poker[]{});
@@ -50,6 +51,12 @@ public class PokerUtils {
         return Arrays.stream(array).collect(Collectors.toList());
     }
 
+    /**
+     * 从第一张牌开始，从牌堆中随机挑选一张。
+     *
+     * @param pokerList 扑克牌
+     * @return 打乱后的扑克牌
+     */
     public static List<Poker> randomPoker1(List<Poker> pokerList) {
         Poker[] array = pokerList.toArray(new Poker[]{});
         List<Poker> res = new ArrayList<>();
