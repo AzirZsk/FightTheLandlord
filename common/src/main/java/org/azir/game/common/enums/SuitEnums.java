@@ -1,4 +1,4 @@
-package org.azir.game.enums;
+package org.azir.game.common.enums;
 
 import lombok.Getter;
 

@@ -1,10 +1,10 @@
-package org.azir.game.entity;
+package org.azir.game.common.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.azir.game.enums.PokerCardEnums;
-import org.azir.game.enums.SuitEnums;
+import org.azir.game.common.enums.PokerCardEnums;
+import org.azir.game.common.enums.SuitEnums;
 
 import java.util.Objects;
 

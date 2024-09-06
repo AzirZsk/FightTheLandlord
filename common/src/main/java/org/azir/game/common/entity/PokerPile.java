@@ -1,7 +1,7 @@
-package org.azir.game.entity;
+package org.azir.game.common.entity;
 
 import lombok.Data;
-import org.azir.game.enums.UserType;
+import org.azir.game.common.enums.UserType;
 
 import java.util.List;
 
