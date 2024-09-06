@@ -1,4 +1,4 @@
-package org.azir.game.common.entity;
+package org.azir.game.common.entity.game;
 
 import lombok.Data;
 import org.azir.game.common.enums.UserType;

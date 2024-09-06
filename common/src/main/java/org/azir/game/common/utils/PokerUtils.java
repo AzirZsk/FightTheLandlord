@@ -1,6 +1,6 @@
-package org.azir.game.common;
+package org.azir.game.common.utils;
 
-import org.azir.game.common.entity.Poker;
+import org.azir.game.common.entity.game.Poker;
 import org.azir.game.common.enums.PokerCardEnums;
 import org.azir.game.common.enums.SuitEnums;
 
@@ -75,6 +75,4 @@ public class PokerUtils {
         }
         return res;
     }
-
-
 }

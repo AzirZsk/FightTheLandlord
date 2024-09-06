@@ -1,4 +1,4 @@
-package org.azir.game.common.entity;
+package org.azir.game.common.entity.game;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
