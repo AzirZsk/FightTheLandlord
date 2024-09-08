@@ -6,5 +6,5 @@ package org.azir.game.common.event;
  * @author zhangshukun
  * @since 2024/09/06
  */
-public abstract class AbstractEvent {
+public abstract class AbstractEvent implements Event {
 }

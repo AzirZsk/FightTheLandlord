@@ -4,7 +4,10 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.azir.game.common.GameThreadFactory;
+import org.azir.game.common.io.protocol.EventCodec;
+import org.azir.game.common.io.protocol.EventFrameDecoder;
 
 /**
  * 游戏服务器启动类
@@ -15,6 +18,8 @@ import org.azir.game.common.GameThreadFactory;
 public class GameServer {
 
     private final ServerConfig serverConfig;
+
+    private final EventCodec eventCodec = new EventCodec();
 
 
     public GameServer(ServerConfig serverConfig) {
@@ -28,10 +33,11 @@ public class GameServer {
         new ServerBootstrap()
                 .group(socketGroup, gameGroup)
                 .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<NioServerSocketChannel>() {
+                .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
-                    protected void initChannel(NioServerSocketChannel ch) throws Exception {
-
+                    protected void initChannel(NioSocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new EventFrameDecoder())
+                                .addLast(eventCodec);
                     }
                 })
                 .bind(serverConfig.getPort());

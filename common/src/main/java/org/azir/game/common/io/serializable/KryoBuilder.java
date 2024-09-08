@@ -1,10 +1,9 @@
 package org.azir.game.common.io.serializable;
 
 import com.esotericsoftware.kryo.Kryo;
-import org.azir.game.common.event.AbstractEvent;
+import org.azir.game.common.event.Event;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -17,24 +16,24 @@ import java.util.List;
  */
 public class KryoBuilder {
 
-    private static final Class<AbstractEvent> ABSTRACT_EVENT_CLASS = AbstractEvent.class;
+    /**
+     * 需要序列化的类
+     */
+    private static final Class<Event> EVENT_CLASS = Event.class;
 
-    private Kryo res = new Kryo();
-
-    public Kryo build() {
-        // todo 获取某个目录下的所有类进行注册，加快序列化速度
+    public static Kryo build() {
+        Kryo res = new Kryo();
+        List<Class<?>> classList = getClassList(EVENT_CLASS);
+        for (Class<?> aClass : classList) {
+            res.register(aClass);
+        }
         return res;
-    }
-
-    public static void main(String[] args) throws ClassNotFoundException {
-        List<Class<?>> classesInSameDirectory = getClassesInSameDirectory(ABSTRACT_EVENT_CLASS);
-        System.out.println();
     }
 
     /**
      * 获取指定类所在目录下的所有类
      */
-    public static List<Class<?>> getClassesInSameDirectory(Class<?> knownClass) throws ClassNotFoundException {
+    public static List<Class<?>> getClassList(Class<?> knownClass) {
         // 获取该类的ClassLoader
         ClassLoader classLoader = knownClass.getClassLoader();
 
@@ -43,12 +42,12 @@ public class KryoBuilder {
         URL classUrl = classLoader.getResource(className);
 
         if (classUrl == null) {
-            throw new IllegalArgumentException("Class file for " + knownClass.getName() + " not found.");
+            throw new IllegalArgumentException("没有找到这个类：" + knownClass.getName());
         }
 
         // 获取类所在的目录
         String classFilePath = URLDecoder.decode(classUrl.getFile(), StandardCharsets.UTF_8);
-        String baseDir = classFilePath.substring(0, classFilePath.length() - className.length());
+        String baseDir = classFilePath.substring(0, classFilePath.indexOf(knownClass.getSimpleName()));
 
         // 获取目录路径并扫描
         File directory = new File(baseDir);
@@ -57,7 +56,11 @@ public class KryoBuilder {
         }
 
         // 获取该目录下的所有类
-        return findClassesInDirectory(directory, knownClass.getPackage().getName());
+        try {
+            return findClassesInDirectory(directory, knownClass.getPackage().getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("加载：" + directory + "目录下的类时异常", e);
+        }
     }
 
     /**
@@ -66,13 +69,9 @@ public class KryoBuilder {
     private static List<Class<?>> findClassesInDirectory(File directory, String packageName) throws ClassNotFoundException {
         List<Class<?>> classes = new ArrayList<>();
         File[] files = directory.listFiles();
-
         if (files != null) {
             for (File file : files) {
-                if (file.isDirectory()) {
-                    // 递归扫描子目录
-                    classes.addAll(findClassesInDirectory(file, packageName + "." + file.getName()));
-                } else if (file.getName().endsWith(".class")) {
+                if (file.getName().endsWith(".class")) {
                     // 去掉 ".class" 扩展名，获取类名
                     String className = file.getName().substring(0, file.getName().length() - 6);
                     classes.add(Class.forName(packageName + '.' + className));
