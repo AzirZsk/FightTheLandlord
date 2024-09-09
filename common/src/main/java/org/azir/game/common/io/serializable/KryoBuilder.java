@@ -11,13 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * kryo序列化构造器类
+ *
  * @author zhangshukun
  * @since 2024/09/06
  */
 public class KryoBuilder {
 
     /**
-     * 需要序列化的类
+     * 需要序列化的类{@link org.azir.game.common.event.Event}所在目录下的包
      */
     private static final Class<Event> EVENT_CLASS = Event.class;
 
