@@ -1,0 +1,3 @@
+socketThreadNums: 1
+gameThreadNums: 2
+port: 10000

@@ -12,16 +12,16 @@ public class ServerConfig {
     /**
      * socket线程数
      */
-    private Integer socketThreadNums;
+    private Integer socketThreadNums = 4;
 
     /**
      * 游戏线程数
      */
-    private Integer gameThreadNums;
+    private Integer gameThreadNums = 8;
 
     /**
      * 端口号
      */
-    private Integer port;
+    private Integer port = 12345;
 
 }
