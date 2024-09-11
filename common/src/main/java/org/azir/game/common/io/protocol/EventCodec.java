@@ -20,14 +20,12 @@ import java.util.List;
  * 斗地主使用的通信协议
  * <pre>
  *  magic: FTL 其他的都关闭连接
- *  版本: MK协议版本
- *  事件类型: {@link Event#getType()}
  *  消息长度: 消息序列化后消息内容的长度
  *  消息内容: 消息主题
- * +-------+---------+----------------+---------+
- * | magic |  type   |  contentLength | content |
- * |  FTL  |  事件类型 |   消息内容长度   | 消息内容  |
- * +-------+----------+----------------+--------+
+ * +-------+----------------+---------+
+ * | magic |  contentLength | content |
+ * |  FTL  |   消息内容长度   | 消息内容  |
+ * +-------+----------------+---------+
  * </pre>
  *
  * @author zhangshukun
@@ -49,11 +47,12 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
 
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Event event, List<Object> list) throws Exception {
+        if (log.isTraceEnabled()) {
+            log.trace("发送事件: {}", event);
+        }
         ByteBuf buffer = channelHandlerContext.alloc().buffer();
         // 写入魔数
         buffer.writeBytes(MAGIC);
-        // 写入事件类型
-        buffer.writeInt(event.getType());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
         Kryo kryo = SERIALIZABLE_THREAD_LOCAL.get();
@@ -63,11 +62,17 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
         buffer.writeInt(outputStream.size());
         // 写入消息内容
         buffer.writeBytes(outputStream.toByteArray());
+        if (log.isTraceEnabled()) {
+            log.trace("事件字节长度: {}", buffer.writerIndex());
+        }
         list.add(buffer);
     }
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
+        if (log.isTraceEnabled()) {
+            log.trace("接收事件");
+        }
         // 读取魔数
         ByteBuf magicByteBuf = byteBuf.readBytes(MAGIC.length);
         byte[] array = magicByteBuf.array();
@@ -76,13 +81,14 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
             channelHandlerContext.close();
             return;
         }
-        int eventType = byteBuf.readInt();
-        log.debug("收到事件类型: {}", eventType);
         int eventLength = byteBuf.readInt();
         byte[] bytes = new byte[eventLength];
         byteBuf.readBytes(bytes);
         Kryo kryo = SERIALIZABLE_THREAD_LOCAL.get();
         Event event = kryo.readObject(new Input(bytes), Event.class);
+        if (log.isTraceEnabled()) {
+            log.trace("接收到的事件: {}", event);
+        }
         list.add(event);
     }
 }
