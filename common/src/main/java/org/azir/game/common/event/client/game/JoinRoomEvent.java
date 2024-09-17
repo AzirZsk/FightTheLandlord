@@ -1,4 +1,4 @@
-package org.azir.game.common.event.client;
+package org.azir.game.common.event.client.game;
 
 import org.azir.game.common.event.AbstractEvent;
 
@@ -10,8 +10,5 @@ import org.azir.game.common.event.AbstractEvent;
  */
 public class JoinRoomEvent extends AbstractEvent {
 
-    @Override
-    public int getType() {
-        return 0;
-    }
+
 }

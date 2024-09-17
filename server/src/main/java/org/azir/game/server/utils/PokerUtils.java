@@ -1,4 +1,4 @@
-package org.azir.game.common.utils;
+package org.azir.game.server.utils;
 
 import org.azir.game.common.entity.game.Poker;
 import org.azir.game.common.enums.PokerCardEnums;

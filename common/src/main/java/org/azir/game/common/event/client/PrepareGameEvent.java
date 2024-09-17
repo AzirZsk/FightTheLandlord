@@ -10,8 +10,5 @@ import org.azir.game.common.event.AbstractEvent;
  */
 public class PrepareGameEvent extends AbstractEvent {
 
-    @Override
-    public int getType() {
-        return 0;
-    }
+
 }

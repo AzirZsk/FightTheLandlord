@@ -1,23 +1,23 @@
-package org.azir.game.common.event.client;
+package org.azir.game.common.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.azir.game.common.event.AbstractEvent;
 
 /**
- * 客户端-登录游戏事件
- *
  * @author zhangshukun
- * @since 2024/9/7
+ * @since 2024/9/15
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginGameEvent extends AbstractEvent {
+public class User {
+
+    private String id;
+
+    private String name;
 
     private String account;
 
     private String password;
-
 }

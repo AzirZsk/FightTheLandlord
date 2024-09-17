@@ -7,6 +7,7 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,12 +24,19 @@ public class KryoBuilder {
      */
     private static final Class<Event> EVENT_CLASS = Event.class;
 
+    private static final List<Class<?>> REGISTER_CLASSES = new ArrayList<>();
+
+    static {
+        REGISTER_CLASSES.add(LocalDateTime.class);
+    }
+
     public static Kryo build() {
         Kryo res = new Kryo();
         List<Class<?>> classList = getClassList(EVENT_CLASS);
         for (Class<?> aClass : classList) {
             res.register(aClass);
         }
+        REGISTER_CLASSES.forEach(res::register);
         return res;
     }
 
@@ -73,6 +81,10 @@ public class KryoBuilder {
         File[] files = directory.listFiles();
         if (files != null) {
             for (File file : files) {
+                if (file.isDirectory()) {
+                    // 当前是文件夹
+                    classes.addAll(findClassesInDirectory(file, packageName + "." + file.getName()));
+                }
                 if (file.getName().endsWith(".class")) {
                     // 去掉 ".class" 扩展名，获取类名
                     String className = file.getName().substring(0, file.getName().length() - 6);

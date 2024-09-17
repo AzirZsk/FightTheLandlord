@@ -56,7 +56,7 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Output output = new Output(outputStream);
         Kryo kryo = SERIALIZABLE_THREAD_LOCAL.get();
-        kryo.writeObject(output, event);
+        kryo.writeClassAndObject(output, event);
         output.close();
         // 写入消息长度
         buffer.writeInt(outputStream.size());
@@ -74,9 +74,9 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
             log.trace("接收事件");
         }
         // 读取魔数
-        ByteBuf magicByteBuf = byteBuf.readBytes(MAGIC.length);
-        byte[] array = magicByteBuf.array();
-        if (!Arrays.equals(MAGIC, array)) {
+        byte[] magic = new byte[MAGIC.length];
+        byteBuf.readBytes(magic);
+        if (!Arrays.equals(MAGIC, magic)) {
             log.error("非法连接: {}", channelHandlerContext.channel().remoteAddress());
             channelHandlerContext.close();
             return;
@@ -85,7 +85,7 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
         byte[] bytes = new byte[eventLength];
         byteBuf.readBytes(bytes);
         Kryo kryo = SERIALIZABLE_THREAD_LOCAL.get();
-        Event event = kryo.readObject(new Input(bytes), Event.class);
+        Event event = (Event) kryo.readClassAndObject(new Input(bytes));
         if (log.isTraceEnabled()) {
             log.trace("接收到的事件: {}", event);
         }

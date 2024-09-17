@@ -11,7 +11,9 @@ import org.azir.game.common.GameThreadFactory;
 import org.azir.game.common.exception.FTLException;
 import org.azir.game.common.io.protocol.EventCodec;
 import org.azir.game.common.io.protocol.EventFrameDecoder;
+import org.azir.game.server.handler.HeartbeatEventHandler;
 import org.azir.game.server.handler.LoginGameEventHandler;
+import org.azir.game.server.manager.user.MemoryUserManager;
 
 /**
  * 游戏服务器启动类
@@ -44,8 +46,10 @@ public class GameServer {
                         protected void initChannel(NioSocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new EventFrameDecoder())
                                     .addLast(EVENT_CODEC)
-                                    .addLast(new LoginGameEventHandler());
+                                    .addLast(new HeartbeatEventHandler())
+                                    .addLast(new LoginGameEventHandler(new MemoryUserManager()));
                             log.info("客户端连接：{}", ch.remoteAddress());
+                            // todo 连接时发送非对称加密的
                         }
                     })
                     .bind(serverConfig.getPort()).sync();

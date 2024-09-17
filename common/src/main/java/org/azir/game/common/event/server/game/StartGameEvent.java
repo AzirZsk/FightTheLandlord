@@ -1,4 +1,4 @@
-package org.azir.game.common.event.server;
+package org.azir.game.common.event.server.game;
 
 import org.azir.game.common.event.AbstractEvent;
 
@@ -10,8 +10,4 @@ import org.azir.game.common.event.AbstractEvent;
  */
 public class StartGameEvent extends AbstractEvent {
 
-    @Override
-    public int getType() {
-        return 0;
-    }
 }

@@ -19,12 +19,12 @@ public abstract class AbstractGameEventHandler<E extends Event> extends SimpleCh
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, E msg) throws Exception {
-        if (log.isDebugEnabled()) {
-            log.debug("收到并开始处理游戏事件:{}", msg);
+        if (log.isTraceEnabled()) {
+            log.trace("收到并开始处理游戏事件:{}", msg);
         }
-        handle(msg);
-        if (log.isDebugEnabled()) {
-            log.debug("成功处理游戏事件");
+        handle(new EventHandlerContext<>(msg, ctx.channel()));
+        if (log.isTraceEnabled()) {
+            log.trace("成功处理游戏事件");
         }
     }
 }
