@@ -20,6 +20,7 @@ public class FTLClient {
         ClientConfig clientConfig = YamlUtils.resolve("config.yaml", ClientConfig.class);
         GameClient gameClient = new GameClient(clientConfig);
         gameClient.connect();
+        Thread.sleep(100);
         IOUtils.login(gameClient.getChannel());
 
     }

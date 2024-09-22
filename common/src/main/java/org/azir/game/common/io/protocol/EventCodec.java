@@ -7,9 +7,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.azir.game.common.event.Event;
+import org.azir.game.common.event.cipher.AESKeyEvent;
 import org.azir.game.common.io.serializable.KryoBuilder;
+import org.azir.game.common.utils.CipherUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
@@ -35,6 +38,8 @@ import java.util.List;
 @ChannelHandler.Sharable
 public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements Serializable {
 
+    public static final AttributeKey<String> AES_SECRET_KEY = AttributeKey.valueOf("AES_SECRET_KEY");
+
     /**
      * 序列化缓存
      */
@@ -45,6 +50,7 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
      */
     private static final byte[] MAGIC = "FTL".getBytes();
 
+    // todo 判断是否已经初始化密钥
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, Event event, List<Object> list) throws Exception {
         if (log.isTraceEnabled()) {
@@ -58,10 +64,17 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
         Kryo kryo = SERIALIZABLE_THREAD_LOCAL.get();
         kryo.writeClassAndObject(output, event);
         output.close();
-        // 写入消息长度
-        buffer.writeInt(outputStream.size());
-        // 写入消息内容
-        buffer.writeBytes(outputStream.toByteArray());
+        if (channelHandlerContext.channel().hasAttr(AES_SECRET_KEY) && !(event instanceof AESKeyEvent)) {
+            byte[] byteArray = outputStream.toByteArray();
+            byte[] bytes = CipherUtils.aesEncrypt(channelHandlerContext.channel().attr(AES_SECRET_KEY).get(), byteArray);
+            buffer.writeInt(bytes.length);
+            buffer.writeBytes(bytes);
+        } else {
+            // 写入消息长度
+            buffer.writeInt(outputStream.size());
+            // 写入消息内容
+            buffer.writeBytes(outputStream.toByteArray());
+        }
         if (log.isTraceEnabled()) {
             log.trace("事件字节长度: {}", buffer.writerIndex());
         }
@@ -84,6 +97,9 @@ public class EventCodec extends MessageToMessageCodec<ByteBuf, Event> implements
         int eventLength = byteBuf.readInt();
         byte[] bytes = new byte[eventLength];
         byteBuf.readBytes(bytes);
+        if (channelHandlerContext.channel().hasAttr(AES_SECRET_KEY)) {
+            bytes = CipherUtils.aesDecrypt(channelHandlerContext.channel().attr(AES_SECRET_KEY).get(), bytes);
+        }
         Kryo kryo = SERIALIZABLE_THREAD_LOCAL.get();
         Event event = (Event) kryo.readClassAndObject(new Input(bytes));
         if (log.isTraceEnabled()) {

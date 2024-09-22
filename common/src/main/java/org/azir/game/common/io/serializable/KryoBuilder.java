@@ -28,6 +28,7 @@ public class KryoBuilder {
 
     static {
         REGISTER_CLASSES.add(LocalDateTime.class);
+        REGISTER_CLASSES.add(byte[].class);
     }
 
     public static Kryo build() {

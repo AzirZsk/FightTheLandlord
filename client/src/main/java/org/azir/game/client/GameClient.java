@@ -6,12 +6,13 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.AttributeKey;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.azir.game.client.handler.LoginResultEventHandler;
+import org.azir.game.client.handler.RSAPublicKeyEventHandler;
 import org.azir.game.common.GameThreadFactory;
 import org.azir.game.common.event.HeartbeatEvent;
-import org.azir.game.common.event.client.LoginGameEvent;
 import org.azir.game.common.exception.FTLException;
 import org.azir.game.common.io.protocol.EventCodec;
 import org.azir.game.common.io.protocol.EventFrameDecoder;
@@ -52,7 +53,8 @@ public class GameClient {
                             ch.pipeline()
                                     .addLast(new EventFrameDecoder())
                                     .addLast(EVENT_CODEC)
-                                    .addLast(new LoginResultEventHandler());
+                                    .addLast(new LoginResultEventHandler())
+                                    .addLast(new RSAPublicKeyEventHandler());
                         }
                     })
                     .connect(clientConfig.getServerHost(), clientConfig.getServerPort())
